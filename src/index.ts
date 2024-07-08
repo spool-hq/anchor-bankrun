@@ -12,6 +12,7 @@ import {
 	TransactionSignature,
 	VersionedTransaction,
 	SendTransactionError,
+	GetBalanceConfig,
 } from "@solana/web3.js";
 import { Provider, Wallet } from "@coral-xyz/anchor";
 import { BanksClient, ProgramTestContext } from "solana-bankrun";
@@ -23,6 +24,7 @@ interface ConnectionInterface {
 	getAccountInfo: Connection["getAccountInfo"];
 	getAccountInfoAndContext: Connection["getAccountInfoAndContext"];
 	getMinimumBalanceForRentExemption: Connection["getMinimumBalanceForRentExemption"];
+	getBalance: Connection["getBalance"];
 }
 
 class BankrunConnectionProxy implements ConnectionInterface {
@@ -60,6 +62,13 @@ class BankrunConnectionProxy implements ConnectionInterface {
 	): Promise<number> {
 		const rent = await this.banksClient.getRent();
 		return Number(rent.minimumBalance(BigInt(dataLength)));
+	}
+	async getBalance(
+		publicKey: PublicKey,
+		commitmentOrConfig?: Commitment | GetBalanceConfig,
+	): Promise<number> {
+		const balance = await this.banksClient.getBalance(publicKey);
+		return Number(balance);
 	}
 }
 
